@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import com.mediacenter.app.listeners.ButtonClickListener;
 import com.mediacenter.app.util.SizesUtil;
 
-public class LoginPanel extends JPanel implements ActionListener {
+public class ForgotPasswordPanel extends JPanel implements ActionListener {
 
 	public ButtonClickListener listener;
 
@@ -24,10 +24,10 @@ public class LoginPanel extends JPanel implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPasswordField passwordField;
+	private JPasswordField passwordField,passwordFieldNew;
 	private JTextField userIdTextField;
 
-	public LoginPanel(MainPanel panel) {
+	public ForgotPasswordPanel(MainPanel panel) {
 		prepateUI();
 		listener= (ButtonClickListener)panel;
 	}
@@ -39,26 +39,36 @@ public class LoginPanel extends JPanel implements ActionListener {
 		userIdTextField = new JTextField(15);
 		userIdTextField.setSize(SizesUtil.TEXTBOX_WIDTH,
 				SizesUtil.TEXTBOX_HEIGHT);
-		JLabel userId = new JLabel("UserName");
+		JLabel userId = new JLabel("User Name");
 
 		JPanel userIdPanel = new JPanel(new FlowLayout());
 		userIdPanel.add(userId);
 		userIdPanel.add(userIdTextField);
-
-		// Password TextField Panel
-
+		
 		passwordField = new JPasswordField(15);
 		passwordField
 				.setSize(SizesUtil.TEXTBOX_WIDTH, SizesUtil.TEXTBOX_HEIGHT);
-		JLabel password = new JLabel("Password");
+		JLabel password = new JLabel("Old Password");
 
 		JPanel passwordPanel = new JPanel(new FlowLayout());
 		passwordPanel.add(password);
 		passwordPanel.add(passwordField);
 
+
+		// Password TextField Panel
+
+		passwordFieldNew = new JPasswordField(15);
+		passwordFieldNew
+				.setSize(SizesUtil.TEXTBOX_WIDTH, SizesUtil.TEXTBOX_HEIGHT);
+		JLabel newPassword = new JLabel("Old Password");
+
+		JPanel newPasswordPanel = new JPanel(new FlowLayout());
+		newPasswordPanel.add(newPassword);
+		newPasswordPanel.add(passwordFieldNew);
+
 		// Send Mail Panel
 
-		JButton login = new JButton("Login");
+		JButton login = new JButton("Reset");
 		login.addActionListener(this);
 		login.setName("login");
 		login.setSize(new Dimension(SizesUtil.BUTTON_WIDTH,
