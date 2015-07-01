@@ -4,7 +4,18 @@ public class User {
 
 	String userId;
 	String userName;
+	String email;
 	String password;
+	String securityQuestion1;
+	String securityAnswer1;
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
 	public String getUserId() {
 		return userId;
@@ -46,7 +57,12 @@ public class User {
 		this.securityAnswer1 = securityAnswer1;
 	}
 
-	String securityQuestion1;
-	String securityAnswer1;
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Name : " + userName);
+		builder.append("Email : " + email);
+		return builder.toString();
+	}
 
 }
