@@ -76,11 +76,12 @@ public class ForgotPasswordPanel extends JPanel implements ActionListener {
 		JPanel loginWrapper = new JPanel();
 		loginWrapper.add(login);
 
-		JPanel jpanel = new JPanel(new GridLayout(3, 1, 0, 10));
+		JPanel jpanel = new JPanel(new GridLayout(4, 1, 0, 10));
 
 		// Adding all panels to the mail panel
 		jpanel.add(userIdPanel);
 		jpanel.add(passwordPanel);
+		jpanel.add(newPasswordPanel);
 		jpanel.add(loginWrapper);
 		wrapperPanel.add(jpanel);
 		wrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
