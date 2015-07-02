@@ -18,11 +18,11 @@ public class MetaDataPanel extends JPanel {
 	}
 
 	private void prepateUI() {
-		metaDataLabel= new JLabel();
+		metaDataLabel= new JLabel("");
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.add(metaDataLabel);
-		
 		add(scrollPane);
+		add(metaDataLabel);
 	}
 	
 	public void seMetaData(String metaData){

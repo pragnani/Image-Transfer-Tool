@@ -1,21 +1,24 @@
 package com.mediacenter.app.panels;
 
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.sax.BodyContentHandler;
+
 import com.mediacenter.app.listeners.ButtonClickListener;
 import com.mediacenter.app.util.IdUtil;
 
@@ -34,10 +37,12 @@ public class MainPanel extends JFrame implements ActionListener,
 
 	private boolean isauthenticate = false;
 
-	private MetaDataPanel metaDataPanel;
 	private ForgotPasswordPanel forgotPanel;
 
-	private SourceFileImageViewerPanel sourcefileImageViewerPanel;
+	private FileChoosePanel fileChooserPanel;
+
+	
+	private ViewerTabMenuPanel viewerTabPanel;
 
 	private static final long serialVersionUID = -1372258589469698192L;
 
@@ -46,8 +51,9 @@ public class MainPanel extends JFrame implements ActionListener,
 	}
 
 	private void prepareUI() {
+		
 
-		JPanel metaPanel = new JPanel();
+		viewerTabPanel=new ViewerTabMenuPanel();
 		mainPanel = new JPanel();
 		targetPanel = new JPanel();
 		setTitle("Media Source Image Transfer Tool");
@@ -64,7 +70,6 @@ public class MainPanel extends JFrame implements ActionListener,
 		titlePanel = new TitlePanel();
 		mainPanel.add(titlePanel);
 		mainPanel.add(targetPanel);
-		mainPanel.add(metaPanel);
 		add(mainPanel);
 		setVisible(true);
 	}
@@ -81,10 +86,10 @@ public class MainPanel extends JFrame implements ActionListener,
 	@Override
 	public void buttonClicked(ActionEvent e) {
 		if (e.getActionCommand().equals("Login")) {
-			// validateUser();
-			// Temporary for testing purpose
-			isauthenticate = true;
-			showMainPanel();
+			validateUser();
+			if (isauthenticate) {
+				showMainPanel();
+			}
 
 		} else if (e.getActionCommand().toString().contains("MOUSE_CLICKED")) {
 			if (e.getID() == IdUtil.FORGOT_PASSWORD) {
@@ -101,18 +106,25 @@ public class MainPanel extends JFrame implements ActionListener,
 
 	private void openFileChooseDialog() {
 
-		JFileChooser fileChooser = sourcefileImageViewerPanel.getFileChooser();
+		JFileChooser fileChooser = fileChooserPanel.getFileChooser();
 		int returnVal = fileChooser.showOpenDialog(MainPanel.this);
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
-			sourcefileImageViewerPanel.setChooseFileText(file.getName());
+			fileChooserPanel.setChooseFileText(file.getName());
 			try {
-				
+				if(file!= null && file.canRead()){
+				targetPanel.removeAll();
+				targetPanel.add(viewerTabPanel);
+				targetPanel.revalidate();
 				extractImageMetaData(file);
-				
+				}
+				else
+				{
+					
+				}
+
 			} catch (Exception e) {
-				// TODO: handle exception
 			}
 
 		} else {
@@ -122,27 +134,42 @@ public class MainPanel extends JFrame implements ActionListener,
 	}
 
 	private void extractImageMetaData(File file) {
+		MetaDataPanel metaDataPanel= viewerTabPanel.getMetaDataPanel();
+		metaDataPanel.seMetaData("");
+		StringBuilder builder = new StringBuilder();
 		try {
-			Metadata metaData= ImageMetadataReader.readMetadata(file);
-			for (Directory directory : metaData.getDirectories()) {
-			    for (Tag tag : directory.getTags()) {
-			        System.out.println(tag);
-			    }
+			AutoDetectParser parser = new AutoDetectParser();
+			BodyContentHandler handler = new BodyContentHandler();
+			Metadata metadata = new Metadata();
+			FileInputStream inputstream = new FileInputStream(file);
+			ParseContext context = new ParseContext();
+
+			parser.parse(inputstream, handler, metadata, context);
+			System.out.println(handler.toString());
+
+			// getting the list of all meta data elements
+			String[] metadataNames = metadata.names();
+			builder.append("<html>");
+			for (String name : metadataNames) {
+
+				builder.append("<font color='blue'><b>" + name
+						+ ": </b></font>" + "<font color='green'>"
+						+ metadata.get(name) + "</font>");
+				builder.append("<br/>");
 			}
-			
-			
-		} catch (ImageProcessingException | IOException e) {
-			e.printStackTrace();
+			builder.append("</html>");
+			metaDataPanel.seMetaData(builder.toString());
+			mainPanel.revalidate();
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 	}
-	
 
 	private void showMainPanel() {
-
-		sourcefileImageViewerPanel = new SourceFileImageViewerPanel(
+		fileChooserPanel = new FileChoosePanel(
 				MainPanel.this);
 		targetPanel.removeAll();
-		targetPanel.add(sourcefileImageViewerPanel);
+		targetPanel.add(fileChooserPanel);
 		mainPanel.revalidate();
 
 	}
@@ -157,7 +184,8 @@ public class MainPanel extends JFrame implements ActionListener,
 					"Please Enter UserName and Password.", "Warning",
 					JOptionPane.WARNING_MESSAGE);
 		} else {
-			//
+			// Temporary for testing purpose
+			isauthenticate = true;
 		}
 	}
 
